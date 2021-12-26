@@ -5,10 +5,7 @@ import hello.itemservice.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -74,15 +71,102 @@ public class BasicItemController {
         return "basic/addForm";
     }
 
+
     /**
-     * 상품 등록 처리
+     * 상품 등록 처리 - @RequestParam
      *
+     * itemName 요청 파라미터 데이터를 해당 변수에 받는다.
+     *
+     * @param itemName
+     * @param price
+     * @param quantity
+     * @param model
+     * @return
+     */
+//    @PostMapping("/add")
+    public String addItemV1(
+            @RequestParam String itemName,
+            @RequestParam int price,
+            @RequestParam Integer quantity,
+            Model model
+    ) {
+
+        // Item 객체를 생성
+        Item item = new Item();
+
+        // itemRepository 를 통해서 저장
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+
+        itemRepository.save(item);
+
+        // 저장된 item 을 모델에 담아서 뷰에 전달
+        model.addAttribute("item", item);
+
+        return "basic/item";
+    }
+
+    /**
+     * 상품 등록 처리 - @ModelAttribute
+     *
+     * @ModelAttribute 어노테이션
+     *  : 요청 파라미터 처리
+     *  : 객체를 생성하고, 요청 파라미터의 값을 프로퍼티 접근법 (setXxx) 으로 입력해준다.
+     *  : 바로 모델 (Model) 에 @ModelAttribute 로 지정한 객체를 자동으로 넣어준다.
+     *
+     * @param item
+     * @param model
+     * @return
+     */
+//    @PostMapping("/add")
+    public String addItemV2(
+            @ModelAttribute("item") Item item,
+            Model model
+    ) {
+
+        itemRepository.save(item);
+
+        // @ModelAttribute 어노테이션으로 인해 주석 가능
+//        model.addAttribute("item", item);
+
+        return "basic/item";
+    }
+
+    /**
+     * addItemV3 - 상품 등록 처리 - ModelAttribute 이름 생략
+     *
+     * @ModelAttribute 의 이름을 생략 가능
+     *
+     * @ModelAttribute 의 이름을 생략하면 모델에 저장될 때 클래스명을 사용
+     * ( 클래스의 첫글자만 소문자로 변경해서 등록 )
+     *
+     * @param item
+     * @return
+     */
+//    @PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item) {
+
+        itemRepository.save(item);
+
+        return "basic/item";
+    }
+
+    /**
+     * addItemV4 - 상품 등록 처리 - ModelAttribute 전체 생략
+     *
+     * @ModelAttribute 어노테이션 자체도 생략 가능
+     * ( 대상 객체는 모델에 자동 등록 )
+     *
+     * @param item
      * @return
      */
     @PostMapping("/add")
-    public String save() {
+    public String addItemV4(Item item) {
 
-        return "basic/addForm";
+        itemRepository.save(item);
+
+        return "basic/item";
     }
 
     /**
