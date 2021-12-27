@@ -170,6 +170,41 @@ public class BasicItemController {
     }
 
     /**
+     * 상품 수정 폼
+     *
+     * @param itemId
+     * @param model
+     * @return
+     */
+    @GetMapping("/{itemId}/edit")
+    public String editForm(@PathVariable long itemId, Model model) {
+
+        // 수정에 필요한 정보 조회
+        Item item = itemRepository.findById(itemId);
+
+        model.addAttribute("item", item);
+
+        // 수정용 폼 뷰 호출
+        return "basic/editForm";
+    }
+
+    /**
+     * 상품 수정 개발
+     *
+     * @param itemId
+     * @param item
+     * @return
+     */
+    @PostMapping("/{itemId}/edit")
+    public String edit(@PathVariable long itemId, @ModelAttribute Item item) {
+
+        itemRepository.update(itemId, item);
+
+        // 뷰 템플릿을 호출하는 대신에 상품 상세 화면으로 이동하도록 리다이렉트를 호출
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    /**
      * 테스트용 데이터 추가
      */
     @PostConstruct
