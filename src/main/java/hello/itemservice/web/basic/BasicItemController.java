@@ -161,12 +161,29 @@ public class BasicItemController {
      * @param item
      * @return
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV4(Item item) {
 
         itemRepository.save(item);
 
         return "basic/item";
+    }
+
+    /**
+     * 상품 등록 처리 이후에 뷰 템플릿이 아니라 상품 상세 화면으로 리다이렉트 하도록 수정
+     *
+     * "redirect:/basic/items/" + item.getId()
+     *  => redirect 에서 + item.getId() 처럼 URL 에 변수를 더해서 사용하는 것은 URL 인코딩이 안 되기 때문에 위험
+     *
+     * @param item
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV5(Item item) {
+
+        itemRepository.save(item);
+
+        return "redirect:/basic/items/" + item.getId();
     }
 
     /**
