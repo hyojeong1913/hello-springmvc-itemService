@@ -17,6 +17,14 @@
             <h2>상품 상세</h2>
         </div>
 
+        <!--
+        뷰 템플릿 메시지 추가
+
+        th:if : 해당 조건이 참이면 실행
+        ${param.status} : thymeleaf 에서 쿼리 파라미터를 편리하게 조회하는 기능
+        -->
+        <h2 th:if="${param.status}" th:text="'저장 완료!'"></h2>
+
         <div>
             <label for="itemId">상품 ID</label>
             <input type="text" id="itemId" name="itemId" class="form-control" value="1"
