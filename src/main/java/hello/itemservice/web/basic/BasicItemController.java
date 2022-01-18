@@ -3,6 +3,7 @@ package hello.itemservice.web.basic;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
  * @RequiredArgsConstruct 어노테이션
  * : final 이 붙은 멤버변수만 사용해서 생성자를 자동으로 만들어준다.
  */
+@Slf4j
 @Controller
 @RequestMapping("/basic/items")
 @RequiredArgsConstructor
@@ -201,6 +203,9 @@ public class BasicItemController {
      */
     @PostMapping("/add")
     public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
+
+        // 상품 판매 여부 체크박스 체크 여부 로그
+        log.info("item.open = {}", item.getOpen());
 
         Item savedItem = itemRepository.save(item);
 
