@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @RequiredArgsConstruct 어노테이션
@@ -23,6 +25,23 @@ import java.util.List;
 public class BasicItemController {
 
     private final ItemRepository itemRepository;
+
+    /**
+     * @ModelAttribute 어노테이션을 사용하여 해당 컨트롤러를 요청할 때 regions 에서 반환한 값을 자동으로 모델에 담는다.
+     *
+     * @return
+     */
+    @ModelAttribute("regions")
+    public Map<String, String> regions() {
+
+        Map<String, String> regions = new LinkedHashMap<>();
+
+        regions.put("SEOUL", "서울");
+        regions.put("BUSAN", "부산");
+        regions.put("JEJU", "제주");
+
+        return regions;
+    }
 
     /**
      * 상품 목록 조회
@@ -206,6 +225,9 @@ public class BasicItemController {
 
         // 상품 판매 여부 체크박스 체크 여부 로그
         log.info("item.open = {}", item.getOpen());
+
+        // 등록 지역 체크박스 체크 여부 로그
+        log.info("item.regions = {}", item.getRegions());
 
         Item savedItem = itemRepository.save(item);
 
