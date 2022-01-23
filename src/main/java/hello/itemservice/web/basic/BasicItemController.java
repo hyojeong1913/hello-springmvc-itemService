@@ -1,5 +1,6 @@
 package hello.itemservice.web.basic;
 
+import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +56,23 @@ public class BasicItemController {
     public ItemType[] itemTypes() {
 
         return ItemType.values();
+    }
+
+    /**
+     * @ModelAttribute 어노테이션을 사용하여 해당 컨트롤러를 요청할 때 deliveryCodes 에서 반환한 값을 자동으로 모델에 담는다.
+     * 
+     * @return
+     */
+    @ModelAttribute("deliveryCodes")
+    public List<DeliveryCode> deliveryCodes() {
+
+        List<DeliveryCode> deliveryCodes = new ArrayList<>();
+
+        deliveryCodes.add(new DeliveryCode("FAST", "빠른 배송"));
+        deliveryCodes.add(new DeliveryCode("NORMAL", "일반 배송"));
+        deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송"));
+
+        return deliveryCodes;
     }
 
     /**
