@@ -2,6 +2,7 @@ package hello.itemservice.web.basic;
 
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
+import hello.itemservice.domain.item.ItemType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -41,6 +42,17 @@ public class BasicItemController {
         regions.put("JEJU", "제주");
 
         return regions;
+    }
+
+    /**
+     * @ModelAttribute 어노테이션을 사용하여 해당 컨트롤러를 요청할 때 itemTypes 에서 반환한 값을 자동으로 모델에 담는다.
+     * 
+     * @return
+     */
+    @ModelAttribute("itemTypes")
+    public ItemType[] itemTypes() {
+
+        return ItemType.values();
     }
 
     /**
@@ -228,6 +240,9 @@ public class BasicItemController {
 
         // 등록 지역 체크박스 체크 여부 로그
         log.info("item.regions = {}", item.getRegions());
+
+        // 상품 종류 라디오버튼 체크 여부 로그
+        log.info("item.itemType = {}", item.getItemType());
 
         Item savedItem = itemRepository.save(item);
 
