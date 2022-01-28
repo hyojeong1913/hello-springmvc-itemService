@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -248,9 +251,10 @@ public class BasicItemController {
      *
      * @param item
      * @param redirectAttributes
+     * @param model
      * @return
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV6(Item item, RedirectAttributes redirectAttributes, Model model) {
 
         // 상품 판매 여부 체크박스 체크 여부 로그
@@ -295,6 +299,70 @@ public class BasicItemController {
         if (!errors.isEmpty()) {
 
             model.addAttribute("errors", errors);
+
+            // 다시 상품 등록 화면으로
+            return "basic/addForm";
+        }
+
+        /**
+         * 검증 성공
+         */
+
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        // pathVariable 바인딩 ( 예: {itemId} )
+        // 나머지는 쿼리 파라미터로 처리 ( 예: ?status=true )
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    /**
+     * BindingResult1
+     * 
+     * 필드에 오류가 있으면 FieldError 객체를 생성해서 bindingResult 에 담아두면 된다.
+     *
+     * BindingResult bindingResult 파라미터의 위치는 @ModelAttribute Item item 다음에 와야 한다.
+     *
+     * @param item
+     * @param bindingResult
+     * @param redirectAttributes
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV7(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        // 상품명 검증
+        if (!StringUtils.hasText(item.getItemName())) {
+            bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다."));
+        }
+
+        // 상품 가격 검증
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.addError(new FieldError("item", "price", "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+        }
+
+        // 상품 수량 검증
+        if (item.getQuantity() == null || item.getQuantity() > 9999) {
+            bindingResult.addError(new FieldError("item", "quantity", "수량은 최대 9,999 까지 허용합니다."));
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+
+            int resultPrice = item.getPrice() * item.getQuantity();
+
+            if (resultPrice < 10000) {
+
+                bindingResult.addError(new ObjectError("item", "가격 * 수량 의 합은 10,000 원 이상이어야 합니다. 현재 값 = " + resultPrice));
+            }
+        }
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            log.info("errors = {}", bindingResult);
 
             // 다시 상품 등록 화면으로
             return "basic/addForm";
