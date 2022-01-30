@@ -330,7 +330,7 @@ public class BasicItemController {
      * @param redirectAttributes
      * @return
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV7(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         // 상품명 검증
@@ -356,6 +356,81 @@ public class BasicItemController {
             if (resultPrice < 10000) {
 
                 bindingResult.addError(new ObjectError("item", "가격 * 수량 의 합은 10,000 원 이상이어야 합니다. 현재 값 = " + resultPrice));
+            }
+        }
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            log.info("errors = {}", bindingResult);
+
+            // 다시 상품 등록 화면으로
+            return "basic/addForm";
+        }
+
+        /**
+         * 검증 성공
+         */
+
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        // pathVariable 바인딩 ( 예: {itemId} )
+        // 나머지는 쿼리 파라미터로 처리 ( 예: ?status=true )
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    /**
+     * 오류 발생시 사용자 입력 값 유지
+     *
+     * public FieldError(
+     *      String objectName,              // 오류가 발생한 객체 이름
+     *      String field,                   // 오류 필드
+     *      @Nullable Object rejectedValue, // 사용자가 입력한 값 (거절된 값)
+     *      boolean bindingFailure,         // 타입 오류 같은 바인딩 실패인지, 검증 실패인지 구분 값
+     *      @Nullable String[] codes,       // 메시지 코드
+     *      @Nullable Object[] arguments,   // 메시지에서 사용하는 인자
+     *      @Nullable String defaultMessage // 기본 오류 메시지
+     * )
+     *
+     * 타임리프의 th:field 는 정상 상황에는 모델 객체의 값을 사용하지만, 오류가 발생하면 FieldError 에서 보관한 값을 사용해서 값을 출력
+     *
+     * 타입 오류로 바인딩에 실패하면 스프링은 FieldError 를 생성하면서 사용자가 입력한 값을 넣어두고
+     * 해당 오류를 BindingResult 에 담아서 컨트롤러를 호출
+     * 
+     * @param item
+     * @param bindingResult
+     * @param redirectAttributes
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV8(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        // 상품명 검증
+        if (!StringUtils.hasText(item.getItemName())) {
+            bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
+        }
+
+        // 상품 가격 검증
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.addError(new FieldError("item", "price", item.getPrice(), false, null, null, "가격은 1,000 ~ 1,000,000 까지 허용합니다."));
+        }
+
+        // 상품 수량 검증
+        if (item.getQuantity() == null || item.getQuantity() > 9999) {
+            bindingResult.addError(new FieldError("item", "quantity", item.getQuantity(), false, null, null, "수량은 최대 9,999 까지 허용합니다."));
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+
+            int resultPrice = item.getPrice() * item.getQuantity();
+
+            if (resultPrice < 10000) {
+
+                bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량 의 합은 10,000 원 이상이어야 합니다. 현재 값 = " + resultPrice));
             }
         }
 
