@@ -467,7 +467,7 @@ public class BasicItemController {
      * @param redirectAttributes
      * @return
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV9(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         // 상품명 검증
@@ -493,6 +493,80 @@ public class BasicItemController {
             if (resultPrice < 10000) {
 
                 bindingResult.addError(new ObjectError("item", new String[]{"totalPriceMin"}, new Object[]{10000, resultPrice}, null));
+            }
+        }
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            log.info("errors = {}", bindingResult);
+
+            // 다시 상품 등록 화면으로
+            return "basic/addForm";
+        }
+
+        /**
+         * 검증 성공
+         */
+
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        // pathVariable 바인딩 ( 예: {itemId} )
+        // 나머지는 쿼리 파라미터로 처리 ( 예: ?status=true )
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    /**
+     * 오류 코드와 메시지 처리2
+     *
+     * BindingResult 는 검증해야 할 객체인 target 바로 다음에 오기 때문에 검증해야 할 객체를 알고 있다.
+     *
+     * BindingResult 가 제공하는 rejectValue() , reject() 를 사용하면 FieldError , ObjectError 를 직접 생성하지 않고, 깔끔하게 검증 오류를 다룰 수 있다.
+     *
+     * void rejectValue(
+     *      @Nullable String field,         // 오류 필드명
+     *      String errorCode,               // 오류 코드
+     *      @Nullable Object[] errorArgs,   // 오류 메시지에서 변수를 치환하기 위한 값
+     *      @Nullable String defaultMessage // 오류 메시지를 찾을 수 없을 때 사용하는 기본 메시지
+     * );
+     *
+     * @param item
+     * @param bindingResult
+     * @param redirectAttributes
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV10(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        log.info("objectName = {}", bindingResult.getObjectName());
+        log.info("target = {}", bindingResult.getTarget());
+
+        // 상품명 검증
+        if (!StringUtils.hasText(item.getItemName())) {
+            bindingResult.rejectValue("itemName", "required");
+        }
+
+        // 상품 가격 검증
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            bindingResult.rejectValue("price", "range", new Object[]{1000, 1000000}, null);
+        }
+
+        // 상품 수량 검증
+        if (item.getQuantity() == null || item.getQuantity() > 9999) {
+            bindingResult.rejectValue("quantity", "max", new Object[]{9999}, null);
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+
+            int resultPrice = item.getPrice() * item.getQuantity();
+
+            if (resultPrice < 10000) {
+
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
         }
 
