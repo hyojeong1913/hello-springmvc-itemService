@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -545,9 +546,11 @@ public class BasicItemController {
         log.info("target = {}", bindingResult.getTarget());
 
         // 상품명 검증
-        if (!StringUtils.hasText(item.getItemName())) {
-            bindingResult.rejectValue("itemName", "required");
-        }
+//        if (!StringUtils.hasText(item.getItemName())) {
+//            bindingResult.rejectValue("itemName", "required");
+//        }
+        // 위 검증 코드를 한 줄로 요약 가능하지만 공백 검증 같은 단순한 기능만 제공
+        ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required");
 
         // 상품 가격 검증
         if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
