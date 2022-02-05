@@ -31,6 +31,7 @@ import java.util.*;
 public class BasicItemController {
 
     private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator; // ItemValidator 를 스프링 빈으로 주입 받음
 
     /**
      * @ModelAttribute 어노테이션을 사용하여 해당 컨트롤러를 요청할 때 regions 에서 반환한 값을 자동으로 모델에 담는다.
@@ -539,7 +540,7 @@ public class BasicItemController {
      * @param redirectAttributes
      * @return
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV10(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         log.info("objectName = {}", bindingResult.getObjectName());
@@ -572,6 +573,43 @@ public class BasicItemController {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
         }
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            log.info("errors = {}", bindingResult);
+
+            // 다시 상품 등록 화면으로
+            return "basic/addForm";
+        }
+
+        /**
+         * 검증 성공
+         */
+
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        // pathVariable 바인딩 ( 예: {itemId} )
+        // 나머지는 쿼리 파라미터로 처리 ( 예: ?status=true )
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    /**
+     * Validator 분리1
+     *
+     * @param item
+     * @param bindingResult
+     * @param redirectAttributes
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV11(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+        // ItemValidator 를 직접 호출
+        itemValidator.validate(item, bindingResult);
 
         // 검증 실패 시
         if (bindingResult.hasErrors()) {
