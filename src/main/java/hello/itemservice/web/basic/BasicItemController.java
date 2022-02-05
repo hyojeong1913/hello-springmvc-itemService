@@ -13,6 +13,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -32,6 +34,17 @@ public class BasicItemController {
 
     private final ItemRepository itemRepository;
     private final ItemValidator itemValidator; // ItemValidator 를 스프링 빈으로 주입 받음
+
+    /**
+     * 해당 컨트롤러에서는 검증기를 자동으로 적용
+     *
+     * @param dataBinder
+     */
+    @InitBinder
+    public void init(WebDataBinder dataBinder) {
+
+        dataBinder.addValidators(itemValidator);
+    }
 
     /**
      * @ModelAttribute 어노테이션을 사용하여 해당 컨트롤러를 요청할 때 regions 에서 반환한 값을 자동으로 모델에 담는다.
@@ -605,11 +618,51 @@ public class BasicItemController {
      * @param redirectAttributes
      * @return
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItemV11(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 
         // ItemValidator 를 직접 호출
         itemValidator.validate(item, bindingResult);
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            log.info("errors = {}", bindingResult);
+
+            // 다시 상품 등록 화면으로
+            return "basic/addForm";
+        }
+
+        /**
+         * 검증 성공
+         */
+
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        // pathVariable 바인딩 ( 예: {itemId} )
+        // 나머지는 쿼리 파라미터로 처리 ( 예: ?status=true )
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    /**
+     * Validator 분리2
+     *
+     * @Validated 애노테이션 : 검증기를 실행하라는 애노테이션
+     *
+     * @param item
+     * @param bindingResult
+     * @param redirectAttributes
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV12(
+            @Validated @ModelAttribute Item item,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
 
         // 검증 실패 시
         if (bindingResult.hasErrors()) {
