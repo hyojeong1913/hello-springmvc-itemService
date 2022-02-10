@@ -175,15 +175,26 @@ public class BasicItemControllerV2 {
      *
      * @param itemId
      * @param item
+     * @param bindingResult
      * @return
      */
     @PostMapping("/{itemId}/edit")
-    public String edit(@PathVariable long itemId, @ModelAttribute Item item) {
+    public String edit(
+            @PathVariable long itemId,
+            @Validated @ModelAttribute Item item,
+            BindingResult bindingResult
+    ) {
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            return "basicV2/editForm";
+        }
 
         itemRepository.update(itemId, item);
 
         // 뷰 템플릿을 호출하는 대신에 상품 상세 화면으로 이동하도록 리다이렉트를 호출
-        return "redirect:/basicV2/items/{itemId}";
+        return "redirect:/basic/v2/items/{itemId}";
     }
 
     /**
