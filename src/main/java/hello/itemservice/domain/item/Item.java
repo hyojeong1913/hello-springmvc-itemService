@@ -2,6 +2,7 @@ package hello.itemservice.domain.item;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
+import org.hibernate.validator.constraints.ScriptAssert;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
@@ -22,8 +23,16 @@ import java.util.List;
  * 
  * @Max(c) 어노테이션
  *  : 최대 c 까지만 허용한다.
+ *
+ * @ScriptAssert 어노테이션
+ *  : 오브젝트 관련 오류 처리 방법 중 하나이나 권장X
  */
 @Data
+//@ScriptAssert(
+//        lang = "javascript",
+//        script = "_this.price * _this.quantity >= 10000",
+//        message = "상품의 가격 * 수량의 합은 10,000 원 이상이어야 합니다."
+//)
 public class Item {
 
     private Long id;
