@@ -1,9 +1,6 @@
 package hello.itemservice.web.basic;
 
-import hello.itemservice.domain.item.DeliveryCode;
-import hello.itemservice.domain.item.Item;
-import hello.itemservice.domain.item.ItemRepository;
-import hello.itemservice.domain.item.ItemType;
+import hello.itemservice.domain.item.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -126,7 +123,7 @@ public class BasicItemControllerV2 {
         return "basicV2/addForm";
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     public String addItem(
             @Validated @ModelAttribute Item item,
             BindingResult bindingResult,
@@ -149,6 +146,39 @@ public class BasicItemControllerV2 {
         redirectAttributes.addAttribute("status", true);
 
         return "redirect:/basicV2/items/{itemId}";
+    }
+
+    /**
+     * 상품 등록
+     *
+     * @param item
+     * @param bindingResult
+     * @param redirectAttributes
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV2(
+            @Validated(value = SaveCheck.class) @ModelAttribute Item item,
+            BindingResult bindingResult,
+            RedirectAttributes redirectAttributes
+    ) {
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            return "basicV2/addForm";
+        }
+
+        /**
+         * 검증 성공
+         */
+
+        Item savedItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        return "redirect:/basic/v2/items/{itemId}";
     }
 
     /**
@@ -178,10 +208,37 @@ public class BasicItemControllerV2 {
      * @param bindingResult
      * @return
      */
-    @PostMapping("/{itemId}/edit")
+//    @PostMapping("/{itemId}/edit")
     public String edit(
             @PathVariable long itemId,
             @Validated @ModelAttribute Item item,
+            BindingResult bindingResult
+    ) {
+
+        // 검증 실패 시
+        if (bindingResult.hasErrors()) {
+
+            return "basicV2/editForm";
+        }
+
+        itemRepository.update(itemId, item);
+
+        // 뷰 템플릿을 호출하는 대신에 상품 상세 화면으로 이동하도록 리다이렉트를 호출
+        return "redirect:/basic/v2/items/{itemId}";
+    }
+
+    /**
+     * 상품 수정
+     *
+     * @param itemId
+     * @param item
+     * @param bindingResult
+     * @return
+     */
+    @PostMapping("/{itemId}/edit")
+    public String editV2(
+            @PathVariable long itemId,
+            @Validated(value = UpdateCheck.class) @ModelAttribute Item item,
             BindingResult bindingResult
     ) {
 
