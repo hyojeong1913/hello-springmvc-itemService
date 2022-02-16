@@ -43,16 +43,16 @@ public class MemberRepository {
     /**
      * 회원 아이디로 조회
      *
-     * @param longId
+     * @param loginId
      * @return
      */
-    public Optional<Member> findByLongId(String longId) {
+    public Optional<Member> findByLoginId(String loginId) {
 
 //        List<Member> all = findAll();
 //
 //        for (Member m : all) {
 //
-//            if (m.getLongId().equals(longId)) {
+//            if (m.getLoginId().equals(loginId)) {
 //
 //                return Optional.of(m);
 //            }
@@ -62,7 +62,7 @@ public class MemberRepository {
 
         // 위 코드를 해당 코드로 축약 가능
         return findAll().stream()
-                .filter(m -> m.getLoginId().equals(longId))
+                .filter(m -> m.getLoginId().equals(loginId))
                 .findFirst();
     }
 
