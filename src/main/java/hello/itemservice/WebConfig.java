@@ -2,9 +2,12 @@ package hello.itemservice;
 
 import hello.itemservice.web.filter.LogFilter;
 import hello.itemservice.web.filter.LoginCheckFilter;
+import hello.itemservice.web.interceptor.LoginInterceptor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.Filter;
 
@@ -12,9 +15,19 @@ import javax.servlet.Filter;
  * 필터 설정
  */
 @Configuration
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
 
-    @Bean
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+
+        // 인터셉터 등록
+        registry.addInterceptor(new LoginInterceptor())
+                .order(1) // 인터셉터의 호출 순서를 지정. 낮을 수록 먼저 호출
+                .addPathPatterns("/**") // 인터셉터를 적용할 URL 패턴 지정
+                .excludePathPatterns("/css/**", "/*.ico", "/error"); // 인터셉터에서 제외할 패턴 지정
+    }
+
+//    @Bean
     public FilterRegistrationBean logFilter() {
 
         FilterRegistrationBean<Filter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
