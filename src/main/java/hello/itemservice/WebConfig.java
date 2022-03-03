@@ -48,7 +48,7 @@ public class WebConfig implements WebMvcConfigurer {
                         // 로그인 처리 - 필터, 인터셉터 관련 URL
                         "/", "/members/add", "/login", "/logout", "/css/**", "/*.ico", "/error",
                         // 예외 처리와 오류 페이지 관련 URL
-                        "/error-ex", "/error-404", "/error-500"
+                        "/error-ex", "/error-404", "/error-500", "/error-page/**"
                 );
     }
 
