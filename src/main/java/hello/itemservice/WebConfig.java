@@ -1,6 +1,7 @@
 package hello.itemservice;
 
 import hello.itemservice.web.argumentresolver.LoginMemberArgumentResolver;
+import hello.itemservice.web.exception.interceptor.LogInterceptor;
 import hello.itemservice.web.filter.LogFilter;
 import hello.itemservice.web.filter.LoginCheckFilter;
 import hello.itemservice.web.interceptor.LoginCheckInterceptor;
@@ -27,7 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
      *
      * @return
      */
-    @Bean
+//    @Bean
     public FilterRegistrationBean logFilter() {
 
         FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
@@ -43,6 +44,20 @@ public class WebConfig implements WebMvcConfigurer {
         filterRegistrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ERROR);
 
         return filterRegistrationBean;
+    }
+
+    /**
+     * 서블릿 예외처리 인터셉터
+     *
+     * @param registry
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "/*.ico", "/error", "/error-page/**");
     }
 
     /**
