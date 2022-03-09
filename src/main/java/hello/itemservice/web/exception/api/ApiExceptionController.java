@@ -14,7 +14,7 @@ public class ApiExceptionController {
     /**
      * 회원 조회
      *
-     * URL 에 전달된 id 의 값이 ex 이면 예외 발생
+     * URL 에 전달된 id 의 값이 ex 또는 bad 이면 예외 발생
      *
      * @param id
      * @return
@@ -25,6 +25,12 @@ public class ApiExceptionController {
         if (id.equals("ex")) {
 
             throw new RuntimeException("잘못된 사용자");
+        }
+
+        // IllegalArgumentException 발생
+        if (id.equals("bad")) {
+
+            throw new IllegalArgumentException("잘못된 입력 값");
         }
 
         return new MemberDto(id, "hello " + id);
