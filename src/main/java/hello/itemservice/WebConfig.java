@@ -7,6 +7,7 @@ import hello.itemservice.web.filter.LoginCheckFilter;
 import hello.itemservice.web.interceptor.LoginCheckInterceptor;
 import hello.itemservice.web.interceptor.LoginInterceptor;
 import hello.itemservice.web.resolver.MyHandlerExceptionResolver;
+import hello.itemservice.web.resolver.UserHandlerExceptionResolver;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,6 +75,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
 
         resolvers.add(new MyHandlerExceptionResolver());
+        resolvers.add(new UserHandlerExceptionResolver());
     }
 
     /**
