@@ -4,15 +4,13 @@ import hello.itemservice.web.exception.exception.UserException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @ExceptionHandler 예외 처리 방법
- * : @ExceptionHandler 애노테이션을 선언하고, 해당 컨트롤러에서 처리하고 싶은 예외를 지정
- */
 @Slf4j
 @RestController
-public class ApiExceptionV2Controller {
+public class ApiExceptionV3Controller {
 
     @Data
     @AllArgsConstructor
@@ -22,7 +20,7 @@ public class ApiExceptionV2Controller {
         private String name;
     }
 
-    @GetMapping("/api2/members/{id}")
+    @GetMapping("/api3/members/{id}")
     public MemberDto getMember(@PathVariable("id") String id) {
 
         if (id.equals("ex")) {
