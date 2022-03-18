@@ -8,9 +8,14 @@ import hello.itemservice.web.interceptor.LoginCheckInterceptor;
 import hello.itemservice.web.interceptor.LoginInterceptor;
 import hello.itemservice.web.resolver.MyHandlerExceptionResolver;
 import hello.itemservice.web.resolver.UserHandlerExceptionResolver;
+import hello.itemservice.web.typeconverter.converter.IntegerToStringConverter;
+import hello.itemservice.web.typeconverter.converter.IpPortToStringConverter;
+import hello.itemservice.web.typeconverter.converter.StringToIntegerConverter;
+import hello.itemservice.web.typeconverter.converter.StringToIpPortConverter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -25,6 +30,23 @@ import java.util.List;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    /**
+     * 컨버터 등록
+     *
+     * 스프링이 내부에서 수 많은 기본 컨버터들을 제공하나
+     * 컨버터를 추가하면 추가한 컨버터가 기본 컨버터보다 높은 우선순위를 가진다.
+     *
+     * @param registry
+     */
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+
+        registry.addConverter(new StringToIntegerConverter());
+        registry.addConverter(new IntegerToStringConverter());
+        registry.addConverter(new StringToIpPortConverter());
+        registry.addConverter(new IpPortToStringConverter());
+    }
 
     /**
      * 서블릿 예외 처리 - 필터

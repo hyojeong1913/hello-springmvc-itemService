@@ -1,5 +1,6 @@
 package hello.itemservice.web.typeconverter.controller;
 
+import hello.itemservice.web.typeconverter.type.IpPort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,6 +50,24 @@ public class HelloController {
     public String helloV2(@RequestParam Integer data) {
 
         System.out.println("data = " + data);
+
+        return "OK";
+    }
+
+    /**
+     * 쿼리 스트링이 @RequestParam IpPort ipPort 에서 객체 타입으로 잘 변환된 것을 확인 가능
+     *
+     * @RequestParam 은 @RequestParam 을 처리하는 ArgumentResolver 인 RequestParamMethodArgumentResolver 에서
+     * ConversionService 를 사용해서 타입을 변환
+     *
+     * @param ipPort
+     * @return
+     */
+    @GetMapping("/ip-port")
+    public String ipPort(@RequestParam IpPort ipPort) {
+
+        System.out.println("ipPort.getIp() = " + ipPort.getIp());
+        System.out.println("ipPort.getPort() = " + ipPort.getPort());
 
         return "OK";
     }
