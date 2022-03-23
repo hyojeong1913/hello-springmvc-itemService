@@ -1,5 +1,6 @@
 package hello.itemservice;
 
+import hello.itemservice.formatter.MyNumberFormatter;
 import hello.itemservice.web.argumentresolver.LoginMemberArgumentResolver;
 import hello.itemservice.web.exception.interceptor.LogInterceptor;
 import hello.itemservice.web.filter.LogFilter;
@@ -42,10 +43,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
 
-        registry.addConverter(new StringToIntegerConverter());
-        registry.addConverter(new IntegerToStringConverter());
+        // 같은 기능을 가진 converter 와 formatter 가 겹치면
+        // converter 가 우선하여 formatter 가 적용되지 않고, converter 가 적용되므로 주석 처리
+//        registry.addConverter(new StringToIntegerConverter());
+//        registry.addConverter(new IntegerToStringConverter());
+
         registry.addConverter(new StringToIpPortConverter());
         registry.addConverter(new IpPortToStringConverter());
+
+        registry.addFormatter(new MyNumberFormatter());
     }
 
     /**
