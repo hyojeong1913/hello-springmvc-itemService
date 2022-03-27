@@ -1,4 +1,4 @@
-package hello.itemservice.web.upload.controller;
+package hello.itemservice.upload.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
