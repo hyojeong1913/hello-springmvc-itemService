@@ -8,13 +8,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -80,5 +84,53 @@ public class ItemController {
         model.addAttribute("item", item);
 
         return "item/view";
+    }
+
+    /**
+     * <img> 태그로 이미지를 조회할 때 사용
+     *
+     * @param filename
+     * @return
+     * @throws MalformedURLException
+     */
+    @ResponseBody
+    @GetMapping("/images/{filename}")
+    public Resource downloadImage(@PathVariable String filename) throws MalformedURLException {
+
+        // UrlResource 로 이미지 파일을 읽어서 @ResponseBody 로 이미지 바이너리를 반환
+        return new UrlResource("file:" + fileStore.getFullPath(filename));
+    }
+
+    /**
+     * 파일을 다운로드할 때 실행
+     *
+     * @param itemId
+     * @return
+     * @throws MalformedURLException
+     */
+    @GetMapping("/attach/{itemId}")
+    public ResponseEntity<Resource> downloadAttach(
+            @PathVariable Long itemId
+    ) throws MalformedURLException {
+
+        Item item = uploadItemRepository.findById(itemId);
+
+        String storeFileName = item.getAttachFile().getStoreFileName();
+        String uploadFileName = item.getAttachFile().getUploadFileName();
+
+        UrlResource resource = new UrlResource("file:" + fileStore.getFullPath(storeFileName));
+
+        log.info("uploadFileName = {}", uploadFileName);
+
+        // 한글파일명 깨짐 방지
+        String encodedUploadFileName = UriUtils.encode(uploadFileName, StandardCharsets.UTF_8);
+
+        // 파일이 다운로드될 수 있도록 헤더 추가
+        String contentDisposition = "attachment; filename=\"" + encodedUploadFileName + "\"";
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .body(resource);
     }
 }
